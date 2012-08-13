@@ -255,11 +255,6 @@ bool _convertToType ( isis::data::Image &base, image_types type )
 	return base.convertToType ( static_cast<unsigned short> ( type ) );
 }
 
-size_t _spliceDownTo ( isis::data::Image &base, const isis::data::dimensions dims )
-{
-	return base.spliceDownTo ( dims );
-}
-
 isis::data::Image _deepCopy( const isis::data::Image &base )
 {
 	switch ( base.getMajorTypeID() ) {
@@ -407,86 +402,27 @@ numeric::array _getArray( isis::python::data::_Image &base, isis::python::data::
 	for( size_t i = 0; i < relDims; i++ ) {
 		dims[i] = size[i];
 	}
+#define CASE_GET_ARRAY( PTYPE, TYPE, NTYPE ) case PTYPE: { \
+	base.makeContiguousChunk<TYPE>(); \
+	const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NTYPE, &base.contiguousChunkList_.back()->voxel<TYPE>( 0 ) ) ) ); \
+	return boost::python::extract<boost::python::numeric::array>( obj );\
+	break; \
+}
 
 	switch( image_type ) {
-	case isis::python::data::DOUBLE: {
-		base.makeContiguousChunk<double>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_DOUBLE, &base.contiguousChunkList_.back()->voxel<double>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::FLOAT: {
-		base.makeContiguousChunk<float>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_FLOAT, &base.contiguousChunkList_.back()->voxel<float>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::INT8_T: {
-		base.makeContiguousChunk<int8_t>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_INT8, &base.contiguousChunkList_.back()->voxel<int8_t>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::UINT8_T: {
-		base.makeContiguousChunk<uint8_t>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_UINT8, &base.contiguousChunkList_.back()->voxel<uint8_t>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::INT16_T: {
-		base.makeContiguousChunk<int16_t>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_INT16, &base.contiguousChunkList_.back()->voxel<int16_t>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::UINT16_T: {
-		base.makeContiguousChunk<uint16_t>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_UINT16, &base.contiguousChunkList_.back()->voxel<uint16_t>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::INT32_T: {
-		base.makeContiguousChunk<int32_t>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_INT32, &base.contiguousChunkList_.back()->voxel<int32_t>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::UINT32_T: {
-		base.makeContiguousChunk<uint32_t>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_UINT32, &base.contiguousChunkList_.back()->voxel<uint32_t>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::INT64_T: {
-		base.makeContiguousChunk<int64_t>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_INT64, &base.contiguousChunkList_.back()->voxel<int64_t>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::UINT64_T: {
-		base.makeContiguousChunk<uint64_t>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_UINT64, &base.contiguousChunkList_.back()->voxel<uint64_t>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::BOOL: {
-		base.makeContiguousChunk<bool>();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_BOOL, &base.contiguousChunkList_.back()->voxel<bool>( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::CFLOAT: {
-		base.makeContiguousChunk<std::complex< float > >();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_CFLOAT, &base.contiguousChunkList_.back()->voxel< std::complex< float > >( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
-	case isis::python::data::CDOUBLE: {
-		base.makeContiguousChunk<std::complex< double > >();
-		const boost::python::object obj( boost::python::handle<>( PyArray_SimpleNewFromData( relDims, dims, NPY_CDOUBLE, &base.contiguousChunkList_.back()->voxel< std::complex< double > >( 0 ) ) ) );
-		return boost::python::extract<boost::python::numeric::array>( obj );
-		break;
-	}
+		CASE_GET_ARRAY( FLOAT, float, NPY_FLOAT );
+		CASE_GET_ARRAY( DOUBLE, double, NPY_DOUBLE );
+		CASE_GET_ARRAY( INT8_T, int8_t, NPY_INT8 );
+		CASE_GET_ARRAY( UINT8_T, uint8_t, NPY_UINT8 );
+		CASE_GET_ARRAY( INT16_T, int16_t, NPY_INT16 );
+		CASE_GET_ARRAY( UINT16_T, uint16_t, NPY_UINT16 );
+		CASE_GET_ARRAY( INT32_T, int32_t, NPY_INT32 );
+		CASE_GET_ARRAY( UINT32_T, uint32_t, NPY_UINT32 );
+		CASE_GET_ARRAY( INT64_T, int64_t, NPY_INT64 );
+		CASE_GET_ARRAY( UINT64_T, uint64_t, NPY_UINT64 );
+		CASE_GET_ARRAY( BOOL, bool, NPY_BOOL );
+		CASE_GET_ARRAY( CFLOAT, std::complex< float >, NPY_CFLOAT );
+		CASE_GET_ARRAY( CDOUBLE, std::complex< double >, NPY_CDOUBLE );
 	}
 }
 
@@ -502,72 +438,26 @@ isis::data::Image _createFromArray( const boost::python::numeric::array &arr )
 		size[i] = boost::python::extract<int32_t>( shape[i] );
 	}
 
+#define CASE_CREATE_FROM_ARRAY( NTYPE, TYPE ) case NTYPE: {\
+	isis::data::MemChunk<TYPE>ch( ( TYPE *) PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] ); \
+	return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<TYPE>( ch ) ); \
+	break; \
+}
+
 	switch( PyArray_TYPE( arr.ptr() ) ) {
-	case NPY_FLOAT: {
-		isis::data::MemChunk<float>ch( ( float * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<float>( ch ) );
-		break;
-	}
-	case NPY_DOUBLE: {
-		isis::data::MemChunk<double>ch( ( double * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<double>( ch ) );
-		break;
-	}
-	case NPY_INT8: {
-		isis::data::MemChunk<int8_t>ch( ( int8_t * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<int8_t>( ch ) );
-		break;
-	}
-	case NPY_UINT8: {
-		isis::data::MemChunk<uint8_t>ch( ( uint8_t * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<uint8_t>( ch ) );
-		break;
-	}
-	case NPY_INT16: {
-		isis::data::MemChunk<int16_t>ch( ( int16_t * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<int16_t>( ch ) );
-		break;
-	}
-	case NPY_UINT16: {
-		isis::data::MemChunk<uint16_t>ch( ( uint16_t * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<uint16_t>( ch ) );
-		break;
-	}
-	case NPY_INT32: {
-		isis::data::MemChunk<int32_t>ch( ( int32_t * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<int32_t>( ch ) );
-		break;
-	}
-	case NPY_UINT32: {
-		isis::data::MemChunk<uint32_t>ch( ( uint32_t * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<uint32_t>( ch ) );
-		break;
-	}
-	case NPY_INT64: {
-		isis::data::MemChunk<int64_t>ch( ( int64_t * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<int64_t>( ch ) );
-		break;
-	}
-	case NPY_UINT64: {
-		isis::data::MemChunk<uint64_t>ch( ( uint64_t * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<uint64_t>( ch ) );
-		break;
-	}
-	case NPY_BOOL: {
-		isis::data::MemChunk<bool>ch( ( bool * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<bool>( ch ) );
-		break;
-	}
-	case NPY_CFLOAT: {
-		isis::data::MemChunk<std::complex< float > >ch( ( std::complex< float > * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<std::complex< float > >( ch ) );
-		break;
-	}
-	case NPY_CDOUBLE: {
-		isis::data::MemChunk<std::complex< double > >ch( ( std::complex< double > * )PyArray_DATA( arr.ptr() ), size[3], size[2], size[1], size[0] );
-		return isis::data::Image( isis::python::data::VoxelOp::getSwappedChunk<std::complex< double > >( ch ) );
-		break;
-	}
+		CASE_CREATE_FROM_ARRAY( NPY_FLOAT, float );
+		CASE_CREATE_FROM_ARRAY( NPY_DOUBLE, double );
+		CASE_CREATE_FROM_ARRAY( NPY_INT8, int8_t );
+		CASE_CREATE_FROM_ARRAY( NPY_UINT8, uint8_t );
+		CASE_CREATE_FROM_ARRAY( NPY_INT16, int16_t );
+		CASE_CREATE_FROM_ARRAY( NPY_UINT16, uint16_t );
+		CASE_CREATE_FROM_ARRAY( NPY_INT32, int32_t );
+		CASE_CREATE_FROM_ARRAY( NPY_UINT32, uint32_t );
+		CASE_CREATE_FROM_ARRAY( NPY_INT64, int64_t );
+		CASE_CREATE_FROM_ARRAY( NPY_UINT64, uint64_t );
+		CASE_CREATE_FROM_ARRAY( NPY_BOOL, bool );
+		CASE_CREATE_FROM_ARRAY( NPY_CFLOAT, std::complex<float> );
+		CASE_CREATE_FROM_ARRAY( NPY_CDOUBLE, std::complex<double> );
 	default:
 		LOG( PythonLog, error ) << "Unregistered datatype: " << PyArray_TYPE( arr.ptr() ) << ". Returning empty image of type double.";
 		return _createImage( DOUBLE, size[3], size[2], size[1], size[0] );

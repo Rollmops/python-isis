@@ -20,7 +20,10 @@ using namespace isis::python::util;
 
 BOOST_PYTHON_MODULE( _util )
 {
-	def( "setLogger", &isis::python::_setPythonLogger );
+	void ( *_setLogger1 ) ( const boost::python::api::object & ) = isis::python::_setPythonLogger;
+	void ( *_setLogger2 ) ( const boost::python::api::object &, isis::LogLevel ) = isis::python::_setPythonLogger;
+	def( "setLogger", _setLogger1 );
+	def( "setLogger", _setLogger2 );
 	def( "getLogger", &isis::python::_getPythonLogger );
 	def( "hasLogger", &isis::python::_hasLogger );
 
@@ -158,6 +161,13 @@ BOOST_PYTHON_MODULE( _util )
 	.value( "BOOST_DATE", BOOST_DATE )
 	.value( "COLOR_24", COLOR_24 )
 	.value( "COLOR_48", COLOR_48 )
+	;
+	enum_<isis::LogLevel>("log_levels")
+	.value( "ERROR", isis::error )
+	.value( "WARNING", isis::warning )
+	.value( "NOTICE", isis::notice )
+	.value( "INFO", isis::info )
+	.value( "VERBOSE_INFO", isis::verbose_info )
 	;
 
 }

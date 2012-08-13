@@ -20,6 +20,7 @@ namespace isis
 namespace python
 {
 
+void _setPythonLogger( const boost::python::api::object &mH, isis::LogLevel level );
 void _setPythonLogger( const boost::python::api::object &mH );
 boost::python::api::object _getPythonLogger();
 bool _hasLogger();
