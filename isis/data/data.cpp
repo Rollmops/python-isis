@@ -148,7 +148,7 @@ BOOST_PYTHON_MODULE ( _data )
 	.def ( "getPhysicalCoordsFromIndex", &isis::data::Image::getPhysicalCoordsFromIndex )
 	.def ( "getIndexFromPhysicalCoords", &isis::data::Image::getIndexFromPhysicalCoords )
 	.def ( "convertToType", &isis::python::data::Image::_convertToType )
-	.def ( "spliceDownTo", &isis::python::data::Image::_spliceDownTo )
+	.def ( "spliceDownTo", &isis::data::Image::spliceDownTo )
 	.def ( "getDeepCopy", &isis::python::data::Image::_deepCopy )
 	.def ( "getDeepCopyAs", &isis::python::data::Image::_deepCopyAs )
 	.def ( "getCheapCopy", &isis::python::data::Image::_cheapCopy )
@@ -301,6 +301,7 @@ BOOST_PYTHON_MODULE ( _data )
 	.value ( "SLICE_DIM", sliceDim )
 	.value ( "TIME_DIM", timeDim )
 	;
+
 
 
 

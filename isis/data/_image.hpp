@@ -140,8 +140,6 @@ void _transformCoords ( isis::data::Image &base, boost::python::list matrix, con
 
 bool _convertToType ( isis::data::Image &base, isis::python::data::image_types type );
 
-size_t _spliceDownTo ( isis::data::Image &base, const isis::data::dimensions dims );
-
 isis::data::Image _deepCopy( const isis::data::Image &base );
 
 isis::data::Image _deepCopyAs ( const isis::data::Image &base, isis::python::data::image_types type );

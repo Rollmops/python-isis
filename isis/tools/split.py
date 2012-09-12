@@ -3,30 +3,29 @@ __author__ = 'tuerke'
 from .. import data
 
 def _split_time_dim( image, size ):
-    timeSize = image.getSizeAsVector()[3]
+	timeSize = image.getSizeAsVector()[3]
 
-    if( timeSize < size):
-        print 'Error! Your size ' + str(size) + ' is bigger than the number of volumes ' \
-            + str(timeSize)
+	if( timeSize < size):
+		print 'Error! Your size ' + str(size) + ' is bigger than the number of volumes ' \
+			+ str(timeSize)
 
-    if( timeSize % size != 0):
-        print 'Warning! Your size ' + str(size) + ' does not fit n times in the number of volumes ' \
-            + str(timeSize)
+	if( timeSize % size != 0):
+		print 'Warning! Your size ' + str(size) + ' does not fit n times in the number of volumes ' \
+			+ str(timeSize)
+	image.spliceDownTo( data.dimensions.TIME_DIM )
 
-    image.spliceDownTo( data.dimensions.TIME_DIM )
+	allChunks = image.getChunksAsList()
+	chunksPerImage = len(allChunks) / ( timeSize / size)
 
-    allChunks = image.getChunksAsList()
-    chunksPerImage = len(allChunks) / ( timeSize / size)
+	retList = []
+	start = 0
+	for i in range(timeSize / size):
+		sImage = data.Image.createFromChunks( allChunks[start:start+chunksPerImage] )
+		sImage.join(image, False)
+		retList.append( sImage )
+		start+=chunksPerImage
 
-    retList = []
-    start = 0
-    for i in range(timeSize / size):
-        sImage = data.Image.createFromChunks( allChunks[start:start+chunksPerImage] )
-        sImage.join(image, False)
-        retList.append( sImage )
-        start+=chunksPerImage
-
-    return retList
+	return retList
 
 def split( image, size, dimension ):
 	if( dimension == data.dimensions.TIME_DIM ):
