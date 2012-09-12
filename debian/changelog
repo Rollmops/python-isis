@@ -1,3 +1,9 @@
+python-isis (0.15.0-1) UNRELEASED; urgency=low
+
+  * fixed bug in logging system
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Wed, 12 Sep 2012 13:53:22 +0100
+
 python-isis (0.14.0-1) UNRELEASED; urgency=low
 
   * add scientific module for functions that are dep to scipy
